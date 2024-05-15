@@ -33,7 +33,7 @@ class Main(object):
             match = re.search(":(.*)",WlanPassWord)#匹配字符串
 
             if match == None:
-                WlanPassWordList.append("未能獲取到密碼")
+                WlanPassWordList.append("未能获取到密碼")
                 pass
             elif match.group(1).strip() == "1": 
                 WlanPassWordList.append("无密码")

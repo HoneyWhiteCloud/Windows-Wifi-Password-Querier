@@ -57,7 +57,7 @@ class Main(object):
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
             match = re.search(":(.*)",WlanPassWord)#匹配字符串
             if match == None:
-                WlanPassWord="未能獲取到密碼"
+                WlanPassWord="未能获取到密碼"
                 pass
             elif match.group(1).strip() == "1": 
                 WlanPassWord="无密码"
