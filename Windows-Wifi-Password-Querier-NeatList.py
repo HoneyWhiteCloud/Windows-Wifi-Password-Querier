@@ -15,7 +15,6 @@ class Main(object):
                          shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip().split("\n")
 
         WlanName = []
-        WlanPassWordList = []
         
         for i in WlanInfo[1:-1]:
             match = re.search(":(.*)",i)
@@ -26,26 +25,38 @@ class Main(object):
                 pass
             pass
         
-        for i in WlanName:
-            WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(i),
-                                 shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-            
-            match = re.search(":(.*)",WlanPassWord)#匹配字符串
-
-            if match == None:
-                WlanPassWordList.append("未能獲取到密碼")
-                pass
-            elif match.group(1).strip() == "1": 
-                WlanPassWordList.append("无密码")
-                pass
-            else: 
-                WlanPassWordList.append(match.group(1).strip())
-                pass
+        utf8_WifiNameList = [len(i.encode('utf-8')) for i in WlanName]
+        PauselenList = []
+        for i in zip(utf8_WifiNameList,WlanName):
+            PauselenList.append(int(len(i[-1])+(i[0]-len(i[-1]))/2))
+            pass
+        
+        PauseStandard = max(PauselenList)+5
+        
+        OutPrintPauseLenList = []
+        for i in PauselenList:
+            OutPrintPauseLenList.append(PauseStandard-i)
             pass
         
         print("设备上保存的Wi-Fi信息↓\n")
-        for index,i in enumerate(zip(WlanName,WlanPassWordList)):
-            print(index+1,'"{0}"    密码:{1}'.format(i[0],i[-1]))
+        for index,i in enumerate(WlanName):
+            
+            WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(i),
+                                 shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
+            match = re.search(":(.*)",WlanPassWord)#匹配字符串
+            if match == None:
+                WlanPassWord="未能獲取到密碼"
+                pass
+            elif match.group(1).strip() == "1": 
+                WlanPassWord="无密码"
+                pass
+            else: 
+                WlanPassWord=match.group(1).strip()
+                pass
+            pass
+        
+            lon = len(list(str(len(WlanName)))) - len(list(str(index+1)))
+            print("{0} {1}".format(str(index+1)," "*lon)+'"{0}"{1}密码:{2}'.format(i,OutPrintPauseLenList[index]*" ",WlanPassWord))
             pass
         pass
     pass
