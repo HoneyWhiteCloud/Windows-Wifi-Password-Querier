@@ -43,6 +43,7 @@ class Main(object):
                 pass
             pass
         
+        os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
         for index,i in enumerate(zip(WlanName,WlanPassWordList)):
             print(index+1,'"{0}"    密码:{1}'.format(i[0],i[-1]))

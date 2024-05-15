@@ -49,6 +49,7 @@ class Main(object):
             OutPrintPauseLenList.append(PauseStandard-i)
             pass
         
+        os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
         for index,i in enumerate(WlanName):
             
