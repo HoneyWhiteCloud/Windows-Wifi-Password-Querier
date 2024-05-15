@@ -1,6 +1,17 @@
 from subprocess import Popen,PIPE
 import os,re
 
+"""
+在python中，中文等字符是按照两个英文半角字符的大小进行输出的，因此需要转换成utf-8编码后再进行换算
+下列为示范代码↓
+
+txt = "名字12" 
+lenTxt = len(txt) 
+lenTxt_utf8 = len(txt.encode('utf-8')) 
+size = int((lenTxt_utf8 - lenTxt)/2 + lenTxt)
+print("size = " , size ," ,urf8 = ",lenTxt_utf8," ,len = " ,lenTxt)
+"""
+
 class Main(object):
     def __init__(self):
         self.main()
