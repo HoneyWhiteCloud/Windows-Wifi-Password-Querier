@@ -1,5 +1,5 @@
 from subprocess import Popen,PIPE
-import os,re
+import os,re,platform
 
 class Main(object):
     def __init__(self):
@@ -52,6 +52,10 @@ class Main(object):
     pass
 
 if __name__ == "__main__":
-    Main()
-    os.system("pause")
-    pass
+    if platform.system() == "Linux":
+        exit()
+        pass
+    else:
+        Main()
+        os.system("pause")
+        pass

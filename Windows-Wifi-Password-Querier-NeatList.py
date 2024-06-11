@@ -1,5 +1,6 @@
 from subprocess import Popen,PIPE
-import os,re
+import os,re,platform
+
 
 
 ##在python中，中文等字符是按照两个英文半角字符的大小进行输出的，因此需要转换成utf-8编码后再进行换算
@@ -44,7 +45,7 @@ class Main(object):
             PauselenList.append(int(len(i[-1])+(i[0]-len(i[-1]))/2))
             pass
         
-        PauseStandard = max(PauselenList)+5
+        PauseStandard = max(PauselenList)+5#5为最低间隔长度，可任意修改
         
         OutPrintPauseLenList = []
         for i in PauselenList:
@@ -55,7 +56,7 @@ class Main(object):
         print("设备上保存的Wi-Fi信息↓\n")
         for index,i in enumerate(WlanName):
             
-            WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(i),
+            WlanPassWord = Popen(f'netsh wlan show profile "{i}" key=clear | findstr "Key Content:"',
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
             match = re.search(":(.*)",WlanPassWord)#匹配字符串
             
@@ -78,6 +79,10 @@ class Main(object):
     pass
 
 if __name__ == "__main__":
-    Main()
-    os.system("pause")
-    pass
+    if platform.system() == "Linux":
+        exit()
+        pass
+    else:
+        Main()
+        os.system("pause")
+        pass
