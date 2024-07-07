@@ -57,7 +57,7 @@ class Main(object):
         
         with open(JSON_FILE_PATH, 'w') as json_file:
             json.dump(Wifi_Config_List, json_file, indent=4)
-            print(f"JSON file created at: {JSON_FILE_PATH}")
+            print(f"\nJSON file has created or modified at: {JSON_FILE_PATH}")
             pass
         json_file.close()
         
