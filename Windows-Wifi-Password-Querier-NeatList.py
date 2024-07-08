@@ -54,11 +54,11 @@ class Main(object):
         
         os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
-        for index,i in enumerate(WlanName):
+        for index,wlan_name in enumerate(WlanName):
             
-            WlanPassWord = Popen(f'netsh wlan show profile "{i}" key=clear | findstr "Key Content:"',
+            output = Popen(f'netsh wlan show profile name="{wlan_name}" key=clear',
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-            match = re.search(":(.*)",WlanPassWord)#匹配字符串
+            match = re.search(r"^\s*Key Content\s*:\s*(.*)$", output, re.MULTILINE)
             
             if match == None:
                 WlanPassWord="未能获取到密碼"
@@ -73,7 +73,7 @@ class Main(object):
         
             lon = len(list(str(len(WlanName)))) - len(list(str(index+1)))
             print("{0} {1}".format(str(index+1)," "*lon)
-                  +'"{0}"{1}密码:{2}'.format(i,OutPrintPauseLenList[index]*" ",WlanPassWord))
+                  +'"{0}"{1}密码:{2}'.format(wlan_name,OutPrintPauseLenList[index]*" ",WlanPassWord))
             pass
         pass
     pass
@@ -81,7 +81,6 @@ class Main(object):
 if __name__ == "__main__":
     if platform.system() == "Linux":
         exit()
-        pass
     else:
         Main()
         os.system("pause")

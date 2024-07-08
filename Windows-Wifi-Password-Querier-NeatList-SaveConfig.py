@@ -21,7 +21,7 @@ class Main(object):
     JSON_FILE_PATH = os.path.join(TEMP_PATH, "wifi_config.json")
     
     WlanInfo = Popen("netsh wlan show profile",
-                         shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip().split("\n")
+                     shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip().split("\n")
     WlanNameList = []
     for i in WlanInfo[1:-1]:
         match = re.search(":(.*)",i)
@@ -57,8 +57,7 @@ class Main(object):
         
         with open(JSON_FILE_PATH, 'w') as json_file:
             json.dump(Wifi_Config_List, json_file, indent=4)
-            print(f"\nJSON file has been
-created or modified at: {JSON_FILE_PATH}")
+            print(f"\nJSON file has been created or modified at: {JSON_FILE_PATH}")
             pass
         json_file.close()
         
@@ -69,7 +68,7 @@ created or modified at: {JSON_FILE_PATH}")
             WlanPassWordList = []
             for i in WifiName:
                 WlanPassWord = Popen(f'netsh wlan show profile "{i}" key=clear | findstr "Key Content:"',
-                                        shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
+                                     shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
                 match = re.search(":(.*)",WlanPassWord)#匹配字符串
                 if match == None:
                     WlanPassWordList.append("None")
@@ -104,14 +103,11 @@ created or modified at: {JSON_FILE_PATH}")
         
             WlanPassWordList = []
             for i in WifiName:
-                WlanPassWord = Popen(f'netsh wlan show profile "{i}" key=clear | findstr "Key Content:"',
-                                        shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-                match = re.search(":(.*)",WlanPassWord)#匹配字符串
-                if match == None:
+                output = Popen(f'netsh wlan show profile name="{i}" key=clear',
+                               shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
+                match = re.search(r"^\s*Key Content\s*:\s*(.*)$", output, re.MULTILINE)
+                if match == None or match.group(1).strip() == "1":
                     WlanPassWordList.append("None")
-                    pass
-                elif match.group(1).strip() == "1": 
-                    WlanPassWordList.append("NoPassword")
                     pass
                 else: 
                     WlanPassWordList.append(match.group(1).strip())
@@ -128,11 +124,7 @@ created or modified at: {JSON_FILE_PATH}")
         print("设备上保存的Wi-Fi信息↓\n")
         for index,i in enumerate(zip(WlanName,WlanPassword)):
             if i[-1] == "None":
-                WlanPassWord="未能获取到密碼"
-                pass
-            elif i[-1].strip() == "NoPassword": 
                 WlanPassWord="无密码"
-                pass
             else: 
                 WlanPassWord=i[-1].strip()
                 pass
@@ -180,11 +172,11 @@ created or modified at: {JSON_FILE_PATH}")
         
         os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
-        for index,i in enumerate(WlanName):
+        for index,wlan_name in enumerate(WlanName):
             
-            WlanPassWord = Popen(f'netsh wlan show profile "{i}" key=clear | findstr "Key Content:"',
+            output = Popen(f'netsh wlan show profile name="{wlan_name}" key=clear',
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-            match = re.search(":(.*)",WlanPassWord)#匹配字符串
+            match = re.search(r"^\s*Key Content\s*:\s*(.*)$", output, re.MULTILINE)
             
             if match == None:
                 WlanPassWord="未能获取到密碼"
@@ -199,7 +191,7 @@ created or modified at: {JSON_FILE_PATH}")
         
             lon = len(list(str(len(WlanName)))) - len(list(str(index+1)))
             print("{0} {1}".format(str(index+1)," "*lon)
-                  +'"{0}"{1}密码:{2}'.format(i,OutPrintPauseLenList[index]*" ",WlanPassWord))
+                  +'"{0}"{1}密码:{2}'.format(wlan_name,OutPrintPauseLenList[index]*" ",WlanPassWord))
             pass
         pass
     pass
