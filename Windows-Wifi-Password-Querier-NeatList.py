@@ -60,10 +60,7 @@ class Main(object):
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
             match = re.search(r"^\s*Key Content\s*:\s*(.*)$", output, re.MULTILINE)
             
-            if match == None:
-                WlanPassWord="未能获取到密碼"
-                pass
-            elif match.group(1).strip() == "1": 
+            if match == None or match.group(1).strip() == "1":
                 WlanPassWord="无密码"
                 pass
             else: 

@@ -49,7 +49,7 @@ class Main(object):
     
     def Write_Wifi_Config(self,WifiName,WifiPassword):
         if not os.path.exists(JSON_FILE_PATH):
-            open(JSON_FILE_PATH, 'x').close()
+            open(JSON_FILE_PATH, 'x').close()#使用open()来创建文件...别问我为什么不用os.makedirs()
             
         Wifi_Config_List = [
             {"Name":i[0], "Password":i[-1]} for i in zip(WifiName,WifiPassword)
@@ -178,10 +178,7 @@ class Main(object):
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
             match = re.search(r"^\s*Key Content\s*:\s*(.*)$", output, re.MULTILINE)
             
-            if match == None:
-                WlanPassWord="未能获取到密碼"
-                pass
-            elif match.group(1).strip() == "1": 
+            if match == None or match.group(1).strip() == "1":
                 WlanPassWord="无密码"
                 pass
             else: 
