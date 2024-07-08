@@ -63,23 +63,7 @@ class Main(object):
         
     def Read_Wifi_Config(self,WifiName):
         if not os.path.exists(JSON_FILE_PATH):
-            self.OldWay()
-            
-            WlanPassWordList = []
-            for i in WifiName:
-                WlanPassWord = Popen(f'netsh wlan show profile "{i}" key=clear | findstr "Key Content:"',
-                                     shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-                match = re.search(":(.*)",WlanPassWord)#匹配字符串
-                if match == None:
-                    WlanPassWordList.append("None")
-                    pass
-                elif match.group(1).strip() == "1": 
-                    WlanPassWordList.append("NoPassword")
-                    pass
-                else: 
-                    WlanPassWordList.append(match.group(1).strip())
-                    pass
-                pass
+            WlanPassWordList = self.OldWay()
             self.Write_Wifi_Config(WifiName,WlanPassWordList)
             
         else:
@@ -170,19 +154,21 @@ class Main(object):
             OutPrintPauseLenList.append(PauseStandard-i)
             pass
         
+        WlanPassWordList = []
         os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
         for index,wlan_name in enumerate(WlanName):
-            
             output = Popen(f'netsh wlan show profile name="{wlan_name}" key=clear',
                                  shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
             match = re.search(r"^\s*Key Content\s*:\s*(.*)$", output, re.MULTILINE)
             
             if match == None or match.group(1).strip() == "1":
                 WlanPassWord="无密码"
+                WlanPassWordList.append("None")
                 pass
             else: 
                 WlanPassWord=match.group(1).strip()
+                WlanPassWordList.append(match.group(1).strip())
                 pass
             pass
         
@@ -190,7 +176,7 @@ class Main(object):
             print("{0} {1}".format(str(index+1)," "*lon)
                   +'"{0}"{1}密码:{2}'.format(wlan_name,OutPrintPauseLenList[index]*" ",WlanPassWord))
             pass
-        pass
+        return WlanPassWordList
     pass
 
 
