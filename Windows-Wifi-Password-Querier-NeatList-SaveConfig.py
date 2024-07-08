@@ -82,7 +82,8 @@ class Main(object):
                 self.main(WifiName,JsonWifiPassword)
                 pass
             else:
-                self.OldWay()
+                WlanPassWordList = self.OldWay()
+                self.Write_Wifi_Config(WifiName,WlanPassWordList)
                 pass
         
             WlanPassWordList = []
