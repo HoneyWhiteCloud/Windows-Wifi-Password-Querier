@@ -50,7 +50,8 @@ class Main(object):
     def Write_Wifi_Config(self,WifiName,WifiPassword):
         if not os.path.exists(JSON_FILE_PATH):
             open(JSON_FILE_PATH, 'x').close()#使用open()来创建文件...别问我为什么不用os.makedirs()
-            
+            pass
+        
         Wifi_Config_List = [
             {"Name":i[0], "Password":i[-1]} for i in zip(WifiName,WifiPassword)
         ]
@@ -62,20 +63,26 @@ class Main(object):
         json_file.close()
         
     def Read_Wifi_Config(self,WifiName):
-        if not os.path.exists(JSON_FILE_PATH):
-            WlanPassWordList = self.OldWay()
-            self.Write_Wifi_Config(WifiName,WlanPassWordList)
+        if not os.path.exists(JSON_FILE_PATH):#判断是否存在Config，如果没有则先使用老方法先显示WiFi密码，然后在保存到Config内
+            WlanPassWordList = self.OldWay()#获取WiFi密码并输出，返回WiFi密码列表
+            self.Write_Wifi_Config(WifiName,WlanPassWordList)#写Config
             
         else:
             JsonWifiName = []
             JsonWifiPassword = []
             with open(JSON_FILE_PATH, 'r') as json_file:
-                data = json.load(json_file)
-                for item in data:
-                    JsonWifiName.append(item['Name'])
-                    JsonWifiPassword.append(item['Password'])
+                try:
+                    data = json.load(json_file)
+                    for item in data:
+                        JsonWifiName.append(item['Name'])
+                        JsonWifiPassword.append(item['Password'])
+                        pass
                     pass
-                pass
+                except:
+                    WlanPassWordList = self.OldWay()#获取WiFi密码并输出，返回WiFi密码列表
+                    self.Write_Wifi_Config(WifiName,WlanPassWordList)#写Config
+                    return
+                    
             json_file.close()
 
             if JsonWifiName == WifiName:
