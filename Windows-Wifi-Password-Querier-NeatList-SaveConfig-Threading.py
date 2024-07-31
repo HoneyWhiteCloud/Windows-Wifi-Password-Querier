@@ -49,7 +49,45 @@ class Main(object):
     for i in PauselenList:
         OutPrintPauseLenList.append(PauseStandard-i)
         pass
+    def get_password(self,WifiNameList):
+        def get_password(WlanPassWordDictionary, WlanNane, WlanPassWordList):
+            WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(WlanNane),
+                                    shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
+            match = re.search(":(.*)",WlanPassWord)#匹配字符串
+            if match == None:
+                WlanPassWordDictionary[WlanNane] = "未能获取到密碼"
+                WlanPassWordList.append("None")
+                pass
+            elif match.group(1).strip() == "1": 
+                WlanPassWordDictionary[WlanNane] = "无密码"
+                WlanPassWordList.append("None")
+                pass
+            else: 
+                WlanPassWordDictionary[WlanNane] = match.group(1).strip()
+                WlanPassWordList.append(match.group(1).strip())
+                pass
+            pass
         
+        thread_list = []
+        WlanPassWordList = []
+        WlanPassWordDictionary = {}
+        lock = threading.Lock()  # 用于保护对 results 字典的访问
+        
+        for i in WifiNameList:
+            t = threading.Thread(target=get_password, args=(WlanPassWordDictionary, i, WlanPassWordList))
+            thread_list.append(t)
+            pass
+        
+        # 启动所有线程
+        for t in thread_list:
+            t.start()
+        # 等待所有线程完成
+        for t in thread_list:
+            t.join()
+            pass
+        
+        return WlanPassWordDictionary,WlanPassWordList
+            
     def __init__(self):
         self.Read_Wifi_Config(WlanNameList)
         pass
@@ -99,41 +137,10 @@ class Main(object):
                 self.Write_Wifi_Config(WifiName,WlanPassWordList)
                 pass
         
-            def get_password(WlanPassWordDictionary, WlanNane, WlanPassWordList):
-                WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(WlanNane),
-                                        shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-                match = re.search(":(.*)",WlanPassWord)#匹配字符串
-                if match == None:
-                    WlanPassWordDictionary[WlanNane] = "未能获取到密碼"
-                    WlanPassWordList.append("None")
-                    pass
-                elif match.group(1).strip() == "1": 
-                    WlanPassWordDictionary[WlanNane] = "无密码"
-                    WlanPassWordList.append("None")
-                    pass
-                else: 
-                    WlanPassWordDictionary[WlanNane] = match.group(1).strip()
-                    WlanPassWordList.append(match.group(1).strip())
-                    pass
-                pass
             
-            thread_list = []
-            WlanPassWordList = []
-            WlanPassWordDictionary = {}
-            lock = threading.Lock()  # 用于保护对 results 字典的访问
-            
-            for i in WifiName:
-                t = threading.Thread(target=get_password, args=(WlanPassWordDictionary, i, WlanPassWordList))
-                thread_list.append(t)
             
             print("正在检查Wifi密码是否有变动...",end="\r")
-            # 启动所有线程
-            for t in thread_list:
-                t.start()
-
-            # 等待所有线程完成
-            for t in thread_list:
-                t.join()
+            WlanPassWordList,_ = self.get_password(WifiName)
             
             if sorted(WlanPassWordList) != sorted(JsonWifiPassword) or sorted(JsonWifiName) != sorted(WifiName):#如果有一个信息错误，便会修改json中的信息并更新界面
                 self.Write_Wifi_Config(WifiName,WlanPassWordList)
@@ -190,39 +197,7 @@ class Main(object):
             OutPrintPauseLenList.append(PauseStandard-i)
             pass
         
-        def get_password(WlanPassWordDictionary, WlanNane, WlanPassWordList):
-            WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(WlanNane),
-                                    shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip()
-            match = re.search(":(.*)",WlanPassWord)#匹配字符串
-            if match == None:
-                WlanPassWordDictionary[WlanNane] = "未能获取到密碼"
-                WlanPassWordList.append("None")
-                pass
-            elif match.group(1).strip() == "1": 
-                WlanPassWordDictionary[WlanNane] = "无密码"
-                WlanPassWordList.append("None")
-                pass
-            else: 
-                WlanPassWordDictionary[WlanNane] = match.group(1).strip()
-                WlanPassWordList.append(match.group(1).strip())
-                pass
-            pass
-        
-        thread_list = []
-        WlanPassWordList = []
-        WlanPassWordDictionary = {}
-        lock = threading.Lock()  # 用于保护对 results 字典的访问
-        
-        for i in WlanNameList:
-            t = threading.Thread(target=get_password, args=(WlanPassWordDictionary, i, WlanPassWordList))
-            thread_list.append(t)
-         # 启动所有线程
-        for t in thread_list:
-            t.start()
-
-        # 等待所有线程完成
-        for t in thread_list:
-            t.join()
+        WlanPassWordDictionary,WlanPassWordList = self.get_password(WlanNameList)#调用方法获取wifi密码
             
         os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
