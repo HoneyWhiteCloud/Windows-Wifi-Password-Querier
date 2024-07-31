@@ -49,6 +49,7 @@ class Main(object):
     for i in PauselenList:
         OutPrintPauseLenList.append(PauseStandard-i)
         pass
+    
     def get_password(self,WifiNameList):
         def get_password(WlanPassWordDictionary, WlanNane, WlanPassWordList):
             WlanPassWord = Popen('netsh wlan show profile "{}" key=clear | findstr "Key Content:"'.format(WlanNane),
@@ -99,11 +100,11 @@ class Main(object):
         
         Wifi_Config_List = [
             {"Name":i[0], "Password":i[-1]} for i in zip(WifiName,WifiPassword)
-        ]
+            ]
         
         with open(JSON_FILE_PATH, 'w') as json_file:
             json.dump(Wifi_Config_List, json_file, indent=4)
-            #print(f"\nJSON file has been created or modified at: {JSON_FILE_PATH}")
+            print(f"\nJSON file has been created or modified at: {JSON_FILE_PATH}")
             pass
         json_file.close()
         
@@ -143,8 +144,8 @@ class Main(object):
             WlanPassWordList,_ = self.get_password(WifiName)
             
             if sorted(WlanPassWordList) != sorted(JsonWifiPassword) or sorted(JsonWifiName) != sorted(WifiName):#如果有一个信息错误，便会修改json中的信息并更新界面
-                self.Write_Wifi_Config(WifiName,WlanPassWordList)
                 self.main(WifiName,WlanPassWordList)
+                self.Write_Wifi_Config(WifiName,WlanPassWordList)
                 pass
         
     def main(self,WlanName,WlanPassword):
