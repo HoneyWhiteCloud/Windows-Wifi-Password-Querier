@@ -15,6 +15,7 @@ import os,re,json,platform,threading
 
 class Main(object):
     os.system("chcp 65001 && cls")#设置活动代码页，防止匹配信息错误
+    os.system("cls && color a")
     
     global TEMP_PATH,JSON_FILE_PATH,OutPrintPauseLenList,WlanNameList
     TEMP_PATH = os.path.expandvars("%TEMP%")
@@ -32,6 +33,8 @@ class Main(object):
             pass
         pass
     
+    WlanNameList = sorted(WlanNameList)
+    
     utf8_WifiNameList = [len(i.encode('utf-8')) for i in WlanNameList]
     PauselenList = []
     for i in zip(utf8_WifiNameList,WlanNameList):
@@ -45,6 +48,7 @@ class Main(object):
         print("此电脑上没有保存任何Wifi密码!")
         os.system("pause")
         exit()
+        
     OutPrintPauseLenList = []
     for i in PauselenList:
         OutPrintPauseLenList.append(PauseStandard-i)
@@ -87,6 +91,9 @@ class Main(object):
             t.join()
             pass
         
+        WlanPassWordList = [WlanPassWordDictionary[i] for i in WifiNameList]
+        WlanPassWordDictionary = {k: v for k,v in zip(WifiNameList,WlanPassWordList)}
+        
         return WlanPassWordDictionary,WlanPassWordList
             
     def __init__(self):
@@ -111,7 +118,7 @@ class Main(object):
     def Read_Wifi_Config(self,WifiName):
         if not os.path.exists(JSON_FILE_PATH):#判断是否存在Config，如果没有则先使用老方法先显示WiFi密码，然后在保存到Config内
             WlanPassWordList = self.OldWay()#获取WiFi密码并输出，返回WiFi密码列表
-            self.Write_Wifi_Config(WifiName,WlanPassWordList)#写Config
+            self.Write_Wifi_Config(sorted(WifiName),WlanPassWordList)#写Config
             
         else:
             JsonWifiName = []
@@ -141,9 +148,9 @@ class Main(object):
             
             
             print("正在检查Wifi密码是否有变动...",end="\r")
-            WlanPassWordList,_ = self.get_password(WifiName)
+            _,WlanPassWordList = self.get_password(WifiName)
             
-            if sorted(WlanPassWordList) != sorted(JsonWifiPassword) or sorted(JsonWifiName) != sorted(WifiName):#如果有一个信息错误，便会修改json中的信息并更新界面
+            if WlanPassWordList != JsonWifiPassword:#如果有一个信息错误，便会修改json中的信息并更新界面
                 self.main(WifiName,WlanPassWordList)
                 self.Write_Wifi_Config(WifiName,WlanPassWordList)
                 pass
@@ -166,38 +173,9 @@ class Main(object):
         return
     
     def OldWay(self):
-        os.system("chcp 65001 && cls")#设置活动代码页，防止匹配信息错误
-        os.system("cls && color a")
         
         print("正在获取本机WI-FI密码...")
-        
-        WlanInfo = Popen("netsh wlan show profile",
-                         shell=True,stdout=PIPE,stderr=PIPE).communicate()[0].decode('utf-8').strip().split("\n")
-
-        WlanName = []
-        
-        for i in WlanInfo[1:-1]:
-            match = re.search(":(.*)",i)
-            try:
-                WlanName.append(match.group(1).strip())
-                pass
-            except AttributeError:
-                pass
-            pass
-        
-        utf8_WifiNameList = [len(i.encode('utf-8')) for i in WlanName]
-        PauselenList = []
-        for i in zip(utf8_WifiNameList,WlanName):
-            PauselenList.append(int(len(i[-1])+(i[0]-len(i[-1]))/2))
-            pass
-        
-        PauseStandard = max(PauselenList)+5#5为最低间隔长度，可任意修改
-        
-        OutPrintPauseLenList = []
-        for i in PauselenList:
-            OutPrintPauseLenList.append(PauseStandard-i)
-            pass
-        
+    
         WlanPassWordDictionary,WlanPassWordList = self.get_password(WlanNameList)#调用方法获取wifi密码
             
         os.system("cls")
