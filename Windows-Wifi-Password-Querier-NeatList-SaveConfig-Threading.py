@@ -34,7 +34,7 @@ class Main(object):
             pass
         pass
     
-    WlanNameList = sorted(WlanNameList)
+    WlanNameList = sorted(WlanNameList)#按照名称对所有WIFI排列
     
     utf8_WifiNameList = [len(i.encode('utf-8')) for i in WlanNameList]
     PauselenList = []
@@ -182,7 +182,7 @@ class Main(object):
         os.system("cls")
         print("设备上保存的Wi-Fi信息↓\n")
         for index,i in enumerate(zip(WlanNameList,WlanPassWordDictionary.items())):
-            lon = len(list(str(len(i[0])))) - len(list(str(index+1)))
+            lon = len(list(str(len(WlanNameList)))) - len(list(str(index+1)))
             print("{0} {1}".format(str(index+1)," "*lon)
                   +'"{0}"{1}密码:{2}'.format(i[0],OutPrintPauseLenList[index]*" ",i[-1][-1]))
             pass
