@@ -17,7 +17,7 @@ import os,re,json,platform
 
 class Main(object):
     os.system("chcp 65001 && cls")#设置活动代码页，防止匹配信息错误
-    os.system("cls && color a")
+    os.system("color a")
     
     global TEMP_PATH,JSON_FILE_PATH,OutPrintPauseLenList,WlanNameList
     TEMP_PATH = os.path.expandvars("%TEMP%")
@@ -135,7 +135,7 @@ class Main(object):
         
             
             
-            print("正在检查Wifi密码是否有变动...",end="\r")
+            print("\n正在检查Wifi密码是否有变动...",end="\r")
             _,WlanPassWordList = self.get_password(WifiName)
             
             if WlanPassWordList != JsonWifiPassword:#如果有一个信息错误，便会修改json中的信息并更新界面
@@ -163,7 +163,7 @@ class Main(object):
         for index,(name,pwd) in enumerate(zip(WlanNameList,WlanPassWordDictionary.items())):
             lon = len(list(str(len(WlanNameList))))+1 - len(list(str(index+1)))
             padding = OutPrintPauseLenList[index]
-            print(f'{index+1}{" "*lon}"{name}"{" " * padding}密码: {pwd[-1] if pwd[-1] != "None" else "无密码"}')
+            print(f'{index+1}{" "*lon}"{name}"{" " * padding}密码: {pwd[-1].strip() if pwd[-1] != "None" else "无密码"}')
             pass
         return WlanPassWordList
     pass
