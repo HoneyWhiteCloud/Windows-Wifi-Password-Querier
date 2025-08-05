@@ -828,6 +828,8 @@ class Main(object):
                 print("\n正在更新加密状态...", end="\r")
                 _,WlanPassWordList = self.get_password(WifiName)
                 self.Write_Wifi_Config(WifiName, WlanPassWordList)
+                
+            exit()
         
     def main(self,WlanName,WlanPassword):
         """不再直接调用，改为通过主菜单调用"""
